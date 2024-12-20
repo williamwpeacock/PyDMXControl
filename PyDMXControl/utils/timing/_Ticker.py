@@ -50,7 +50,8 @@ class Ticker:
             # If diff in milliseconds is interval, run
             if self.millis_now() - callback.last >= callback.interval:
                 callback.callback()
-                callback.last = self.millis_now()
+                # CHANGED TO REFLECT TIME WHEN SHOULD HAVE FIRED INSTEAD OF TIME WHEN ACTUALLY FIRED
+                callback.last = callback.last + callback.interval
 
     def __ticker__loop(self):
         # Reset
