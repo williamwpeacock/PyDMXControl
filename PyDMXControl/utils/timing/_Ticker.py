@@ -33,12 +33,30 @@ class Ticker:
     def millis_now() -> float:
         return time() * 1000.0
 
-    def __init__(self, interval_millis: float = DEFAULT_INTERVAL * 1000.0, warn_on_behind: bool = True):
+    def bars_now(self) -> float:
+        return self.millis_to_bars(self.millis_now())
+
+    def relative_bars_to_millis(self, bars: float) -> float:
+        return self.bars_to_millis(bars) + self.__start_millis
+
+    def bars_to_millis(self, bars: float) -> float:
+        return ((bars * 4 * 60 * 1000) / self.__bpm)
+
+    def relative_millis_to_bars(self, millis: float) -> float:
+        return self.millis_to_bars(millis - self.__start_millis)
+
+    def millis_to_bars(self, millis: float) -> float:
+        return ((millis * self.__bpm) / (60 * 1000 * 4))
+
+    def __init__(self, interval_millis: float = DEFAULT_INTERVAL * 1000.0, warn_on_behind: bool = True, bpm: float = 175):
         self.__callbacks = []
         self.__paused = False
         self.__ticking = False
         self.__interval = interval_millis
         self.__warn_on_behind = warn_on_behind
+
+        self.__bpm = bpm
+        self.__start_millis = self.millis_now()
 
     def __ticker(self):
         # Loop over each callback
@@ -93,6 +111,9 @@ class Ticker:
 
     def clear_callbacks(self):
         self.__callbacks = []
+
+    def set_bpm(self, bpm: int):
+        self.__bpm = bpm
 
     def stop(self):
         # Stop the threaded loop
