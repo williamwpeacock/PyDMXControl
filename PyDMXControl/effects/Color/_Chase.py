@@ -83,3 +83,9 @@ class Chase(Effect):
     def start(self):
         self.__start = None
         super().start()
+    
+    def nudge(self, ms):
+        self.__start += ms
+
+    def sync(self, now):
+        self.__start = now
