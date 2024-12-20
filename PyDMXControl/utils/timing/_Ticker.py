@@ -14,6 +14,7 @@ from warnings import warn
 from ..exceptions import InvalidArgumentException
 from ... import DEFAULT_INTERVAL
 
+from ...effects.defaults import Effect
 
 class Callback:
 
@@ -133,3 +134,19 @@ class Ticker:
             # Create the thread and run loop
             thread = Thread(target=self.__ticker__loop, daemon=True)
             thread.start()
+
+    def nudge(self, ms):
+        self.__start_millis += ms
+        for callback in self.__callbacks:
+            callback.last += ms
+            cb_parent_instance = callback.__self__
+            if isinstance(cb_parent_instance, Effect):
+                cb_parent_instance.nudge(ms)
+
+    def sync(self):
+        self.__start_millis = self.millis_now()
+        for callback in self.__callbacks:
+            callback.last = self.__start_millis
+            cb_parent_instance = callback.__self__
+            if isinstance(cb_parent_instance, Effect):
+                cb_parent_instance.source.sync(self.__start_millis)
