@@ -15,6 +15,7 @@ from ..exceptions import InvalidArgumentException
 from ... import DEFAULT_INTERVAL
 
 from ...effects.defaults import Effect
+from ...effects.Custom import Animation
 
 class Callback:
 
@@ -25,6 +26,17 @@ class Callback:
         self.callback = callback
         self.interval = interval
         self.last = last
+        self.source = source
+
+class AnimationCallback:
+
+    def __init__(self, callback, start, end, source):
+        if not callable(callback):
+            raise InvalidArgumentException('callback', 'Not callable')
+
+        self.callback = callback
+        self.start = start
+        self.end = end
         self.source = source
 
 
@@ -51,6 +63,7 @@ class Ticker:
 
     def __init__(self, interval_millis: float = DEFAULT_INTERVAL * 1000.0, warn_on_behind: bool = True, bpm: float = 175):
         self.__callbacks = []
+        self.__animations = []
         self.__paused = False
         self.__ticking = False
         self.__interval = interval_millis
@@ -71,6 +84,12 @@ class Ticker:
                 callback.callback()
                 # CHANGED TO REFLECT TIME WHEN SHOULD HAVE FIRED INSTEAD OF TIME WHEN ACTUALLY FIRED
                 callback.last = callback.last + callback.interval
+
+        for animation in self.__animations:
+            if animation.start < self.millis_now() and self.millis_now() < animation.end:
+                animation.callback(self.bars_now())
+            # elif self.millis_now() >= animation.end:
+            #     animation.stop()
 
     def __ticker__loop(self):
         # Reset
@@ -109,6 +128,15 @@ class Ticker:
         idx = [i for i, cb in enumerate(self.__callbacks) if cb.callback == callback]
         if len(idx):
             del self.__callbacks[idx[0]]
+
+    def add_animation(self, animation: Animation, start_later: bool, start_offset: float = 1):
+        total_offset = (start_later * animation.length) + start_offset
+        start = self.millis_now() - self.bars_to_millis((self.bars_now() % animation.length) - total_offset)
+        end = start + self.bars_to_millis(animation.length)
+        self.__animations.append(AnimationCallback(animation.callback, start, end, getframeinfo(stack()[1][0])))
+
+    def remove_animation(self, animation: Animation, now: float):
+        self.__animations.remove(animation)
 
     def clear_callbacks(self):
         self.__callbacks = []
