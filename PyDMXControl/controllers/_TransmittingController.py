@@ -77,7 +77,7 @@ class TransmittingController(Controller):
         # Drain and stop the thread
         if self.__thread:
             self.__drain()
-            self.__queue.put(None)
+            self.__queue.task_done()
             self.__queue.join()
             self.__thread = None
 
