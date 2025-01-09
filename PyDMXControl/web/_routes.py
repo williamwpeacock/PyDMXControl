@@ -7,6 +7,7 @@
 
 from re import compile as re_compile  # Regex
 from typing import List, Union, Tuple, Dict, Callable  # Typing
+from collections import Counter
 
 from flask import Blueprint, render_template, current_app, redirect, url_for, jsonify  # Flask
 
@@ -271,3 +272,21 @@ def stop_timed_event(te: str):
     except Exception:
         return jsonify({"error": "Timed Event {} failed to stop".format(te)}), 500
     return jsonify({"message": "Timed Event {} stopped".format(te), "elements": {te + "-state": "Stopped"}}), 200
+
+# @routes.route('', methods=['GET'])
+# def custom_update_fixtures():
+#     # show list of fixture types
+#     # select fixture type:
+#     #   show editable channel values
+#     #   show list of fixtures of that type
+#     #   show apply button
+#     #   set channel values, select applicable fixtures, click apply
+#     pass
+
+# Fixture Home
+@routes.route('fixture_types', methods=['GET'])
+def fixture_types():
+    fixture_types = Counter([type(x) for x in current_app.parent.controller.get_all_fixtures()])
+    if len(fixture_types) == 0:
+        return redirect(url_for('.home'))
+    return render_template("fixture_types.jinja2", fixture_types=fixture_types)

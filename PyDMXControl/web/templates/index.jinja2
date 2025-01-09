@@ -46,6 +46,30 @@
         </article>
 
         <article>
+            <h2>Fixture Types</h2>
+            <table>
+                <thead>
+                <tr>
+                    <th>Fixture Type</th>
+                    <th>Num Fixtures</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for fixture in fixture_types.keys() %}
+                    <tr>
+                        <td data-th="Fixture Type">
+                            {{ fixture.__name__ }}</td>
+                        <td data-th="Num Fixtures">
+                            {{ fixture_types[fixture] }}</td>
+                        <td data-th="Full Control">
+                            <a href="{{ url_for('.fixture_types', fid=fixture.__name__) }}" class="button">Control</a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </article>
+
+        <article>
             <h2>Callbacks</h2>
             <table>
                 <thead>
