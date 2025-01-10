@@ -34,6 +34,7 @@ class GUIController(TransmittingController):
 
     def _connect(self):
         self.window = tk.Tk()
+        self.window.attributes('-topmost', True)
         self.__gui_fixtures = []
 
     def add_fixture(self, *args, **kwargs):
