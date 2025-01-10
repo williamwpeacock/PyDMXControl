@@ -41,7 +41,8 @@ def fixture_helpers(this_fixture: Fixture) -> Dict[str, Callable]:
 # Home
 @routes.route('', methods=['GET'])
 def home():
-    return render_template("index.jinja2", helpers=helpers)
+    fixture_types = Counter([type(x) for x in current_app.parent.controller.get_all_fixtures()])
+    return render_template("index.jinja2", helpers=helpers, fixture_types=fixture_types)
 
 
 # Global Intensity
@@ -283,10 +284,37 @@ def stop_timed_event(te: str):
 #     #   set channel values, select applicable fixtures, click apply
 #     pass
 
-# Fixture Home
-@routes.route('fixture_types', methods=['GET'])
-def fixture_types():
-    fixture_types = Counter([type(x) for x in current_app.parent.controller.get_all_fixtures()])
-    if len(fixture_types) == 0:
-        return redirect(url_for('.home'))
-    return render_template("fixture_types.jinja2", fixture_types=fixture_types)
+# Fixture Type Home
+@routes.route('fixture_type/<string:f_type>', methods=['GET'])
+def fixture_type(f_type: str):
+    fixtures = [f for f in current_app.parent.controller.get_all_fixtures()
+                if type(f).__name__ == f_type]
+    return render_template("fixture_type.jinja2", fixture_type=f_type, fixtures=fixtures,
+                           fixture_channels=fixture_channels, colors=Colors)
+
+@routes.route('bulk_change/<string:ids>/<string:values>', methods=['GET'])
+def bulk_change(ids: str, values: str):
+    for fid in ids.split('_'):
+        try:
+            fid = int(fid)
+        except:
+            return jsonify({"error": "{} is not an integer".format(fid)}), 404
+
+        this_fixture = current_app.parent.controller.get_fixture(fid)
+        if not this_fixture:
+            return jsonify({"error": "Fixture {} not found".format(fid)}), 404
+        
+        channels_list = this_fixture.channels
+        values_list = values.split('_')
+
+        if not (len(channels_list) == len(values_list)):
+            return jsonify({"error": "Number of values supplied({}) does not equal number of channels ({}).".format(len(values_list), len(channels_list))}, 404)
+
+        this_fixture.set_channels(values_list)
+
+    data = {
+        "message": "Updated all selected fixtures.",
+        "elements": {
+        }
+    }
+    return jsonify(data), 200

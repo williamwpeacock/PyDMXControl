@@ -1,0 +1,80 @@
+{#
+ *  PyDMXControl: A Python 3 module to control DMX using OpenDMX or uDMX.
+ *                Featuring fixture profiles, built-in effects and a web control panel.
+ *  <https://github.com/MattIPv4/PyDMXControl/>
+ *  Copyright (C) 2023 Matt Cowley (MattIPv4) (me@mattcowley.co.uk)
+ #}
+{% extends "base.jinja2" %}
+
+{% block body %}
+    <h2>{{ fixture_type }}</h2>
+    <a href="{{ url_for('.home') }}" class="button">&lt; Home</a>
+
+    <section>
+
+        <article>
+            <h2>Channels</h2>
+            <table>
+                <thead>
+                <tr>
+                    <th>Channel No.</th>
+                    <th>Channel Name</th>
+                    <th>Quick Control</th>
+                    <th>Full Control</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for i, channel in enumerate(fixture_channels(fixtures[0])) %}
+                    <tr>
+                        <td data-th="Channel No.">
+                            {{ (i) }}</td>
+                        <td data-th="Channel Name" id="channel-{{ i }}-name">
+                            {{ channel[0] }}</td>
+                        <td data-th="Control">
+                            <div class="slider">
+                                <input title="{{ channel[0] }}" type="range" min="0" max="255" step="1" id="channel[0]"/>
+                            </div></td>
+                        <td data-th="Full Control">
+                            <label for="intensity_value"></label></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </article>
+
+        {% if fixtures[0].get_color() is not none %}
+            <article>
+                <h2>Colors</h2>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Color Name</th>
+                        <th>Color Value</th>
+                        <th>Apply</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for color in colors %}
+                        <tr>
+                            <td data-th="Color Name">
+                                {{ color.name }}</td>
+                            <td data-th="Color Value">
+                                {{ color.value }}</td>
+                            <td data-th="Apply">
+                                <a href="{{ url_for('.color', fid=fixtures[0].id, val=colors.to_print(color.value, ',')) }}"
+                                   data-no-reload class="button">Apply</a></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <form id="color">
+                    <label for="value">Custom Color</label>
+                    <input id="value" name="value" type="color" value="{{ colors.to_hex(fixtures[0].get_color()) }}"
+                           required/>
+                    <input type="submit" value="Update" id="submit" name="submit"/>
+                </form>
+            </article>
+        {% endif %}
+
+    </section>
+{% endblock body %}

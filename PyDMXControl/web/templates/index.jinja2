@@ -62,7 +62,7 @@
                         <td data-th="Num Fixtures">
                             {{ fixture_types[fixture] }}</td>
                         <td data-th="Full Control">
-                            <a href="{{ url_for('.fixture_types', fid=fixture.__name__) }}" class="button">Control</a></td>
+                            <a href="{{ url_for('.fixture_type', f_type=fixture.__name__) }}" class="button">Control</a></td>
                     </tr>
                 {% endfor %}
                 </tbody>
