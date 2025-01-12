@@ -67,7 +67,7 @@ class Controller(ControllerHelpers):
         self.__dynamic_frame = dynamic_frame
 
         # Ticker for callback
-        self.ticker = Ticker(ticker_interval_millis, not suppress_ticker_behind_warnings)
+        self.ticker = Ticker(self, ticker_interval_millis, not suppress_ticker_behind_warnings)
         self.ticker.start()
 
         # Web control attr
@@ -195,6 +195,10 @@ class Controller(ControllerHelpers):
 
         # Return populated frame
         return self.__frame
+
+    def flush(self):
+        for fixture in self.__fixtures:
+            fixture.flush()
 
     @property
     def dynamic_frame(self) -> bool:

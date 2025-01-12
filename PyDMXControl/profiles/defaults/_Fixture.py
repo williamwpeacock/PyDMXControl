@@ -28,9 +28,17 @@ class Channel:
         self.__timestamp = datetime.utcnow()
 
     def set(self, value: int):
-        self.__value = value
+        self.flush_queue.append(value)
+
         if self.parked is False:
             self.__updated()
+
+    flush_queue = []
+    def flush(self):
+        # TODO: maybe change this algorithm for different blend types
+        if self.flush_queue != []:
+            self.__value = max(self.flush_queue)
+            self.flush_queue = []
 
     @property
     def value(self) -> Tuple[int, datetime]:
@@ -140,8 +148,10 @@ class FixtureHelpers:
         for callback in self.__callbacks:
             self.controller.ticker.remove_callback(callback)
         self.__callbacks = []
-            
 
+    def flush(self):
+        for chan in self.__channels:
+            chan.flush()
 
 class Fixture(FixtureHelpers):
 

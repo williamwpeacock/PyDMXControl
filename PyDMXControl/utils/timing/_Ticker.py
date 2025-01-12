@@ -15,7 +15,9 @@ from ..exceptions import InvalidArgumentException
 from ... import DEFAULT_INTERVAL
 
 from ...effects.defaults import Effect
-from ...effects.Custom import Animation
+from ...animations import Animation
+
+from ...controllers import Controller
 
 class Callback:
 
@@ -61,7 +63,8 @@ class Ticker:
     def millis_to_bars(self, millis: float) -> float:
         return ((millis * self.__bpm) / (60 * 1000 * 4))
 
-    def __init__(self, interval_millis: float = DEFAULT_INTERVAL * 1000.0, warn_on_behind: bool = True, bpm: float = 175):
+    def __init__(self, controller: Controller, interval_millis: float = DEFAULT_INTERVAL * 1000.0, warn_on_behind: bool = True, bpm: float = 175):
+        self.__controller = controller
         self.__callbacks = []
         self.__animations = []
         self.__paused = False
@@ -90,6 +93,8 @@ class Ticker:
                 animation.callback(self.bars_now())
             # elif self.millis_now() >= animation.end:
             #     animation.stop()
+
+        self.__controller.flush()
 
     def __ticker__loop(self):
         # Reset
