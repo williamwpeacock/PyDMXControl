@@ -19,8 +19,8 @@
                 <tr>
                     <th>Channel No.</th>
                     <th>Channel Name</th>
-                    <th>Quick Control</th>
-                    <th>Full Control</th>
+                    <th>Slider</th>
+                    <th>Value</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -30,51 +30,76 @@
                             {{ (i) }}</td>
                         <td data-th="Channel Name" id="channel-{{ i }}-name">
                             {{ channel[0] }}</td>
-                        <td data-th="Control">
+                        <td data-th="Slider">
                             <div class="slider">
-                                <input title="{{ channel[0] }}" type="range" min="0" max="255" step="1" id="channel[0]"/>
+                                <input title="{{ channel[0] }}" type="range" min="0" max="255" step="1" id="{{ channel[0] }}_value" value="0" />
                             </div></td>
-                        <td data-th="Full Control">
-                            <label for="intensity_value"></label></td>
+                        <td data-th="Value">
+                            <label for="{{ channel[0] }}_value">{{ 0 }}</label></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </article>
+        <article>
+            <h2>Fixtures</h2>
+            <table>
+                <thead>
+                <tr>
+                    <th>Fixture ID</th>
+                    <th>Fixture Name</th>
+                    <th>Select</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for fixture in fixtures %}
+                    <tr>
+                        <td data-th="Fixture ID">
+                            {{ fixture.id }}</td>
+                        <td data-th="Fixture Name">
+                            {{ fixture.name }}</td>
+                        <td data-th="Select">
+                                <a href="/" data-no-reload class="button">Select</a></td>
                     </tr>
                 {% endfor %}
                 </tbody>
             </table>
         </article>
 
-        {% if fixtures[0].get_color() is not none %}
-            <article>
-                <h2>Colors</h2>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Color Name</th>
-                        <th>Color Value</th>
-                        <th>Apply</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for color in colors %}
-                        <tr>
-                            <td data-th="Color Name">
-                                {{ color.name }}</td>
-                            <td data-th="Color Value">
-                                {{ color.value }}</td>
-                            <td data-th="Apply">
-                                <a href="{{ url_for('.color', fid=fixtures[0].id, val=colors.to_print(color.value, ',')) }}"
-                                   data-no-reload class="button">Apply</a></td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-                <form id="color">
-                    <label for="value">Custom Color</label>
-                    <input id="value" name="value" type="color" value="{{ colors.to_hex(fixtures[0].get_color()) }}"
-                           required/>
-                    <input type="submit" value="Update" id="submit" name="submit"/>
-                </form>
-            </article>
-        {% endif %}
+        <article>
+            <h2>Apply</h2>
+            <table>
+                <tbody>
+                    <tr><td><input id="clickMe" type="button" value="Apply" onclick="blah();" /></td></tr>
+                </tbody>
+            </table>
+        </article>
 
     </section>
 {% endblock body %}
+
+{% block script %}
+    <script>
+        function change_input(id, value, update) {
+            document.getElementById(id).value = value;
+            input_change(update);
+            console.log("1");
+        }
+
+        function input_change(id, update) {
+            document.querySelector("label[for='"+id+"']").innerText = String(document.getElementById(id).value);
+            console.log("2")
+        }
+
+        function blah() {
+            get("{{ url_for('.bulk_change', ids="1_2_3_4", values="255_255_0_0_0_0_0") }}");
+        }
+
+        {% for channel in fixture_channels(fixtures[0]) %}
+        document.getElementById("{{ channel[0] }}_value").addEventListener("input", function (e) {
+            input_change("{{ channel[0] }}_value", true);
+        });
+        {% endfor %}
+
+    </script>
+{% endblock script %}
