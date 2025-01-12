@@ -11,10 +11,7 @@ from typing import List
 from ._TransmittingController import TransmittingController
 from ..profiles.defaults import Fixture
 
-def _from_rgb(rgb):
-    """translates an rgb tuple of int to a tkinter friendly color code
-    """
-    return "#%02x%02x%02x" % tuple(rgb)
+from .. import Colors
 
 class GUIFixture(tk.Label):
     def __init__(self, window: tk.Tk, fixture: Fixture):
@@ -28,7 +25,7 @@ class GUIFixture(tk.Label):
 
         rgb = [int(v * brightness) for v in self.fixture.get_color()]
 
-        self.configure(bg=_from_rgb(rgb))
+        self.configure(bg=Colors.to_hex(rgb))
 
 class GUIController(TransmittingController):
 
@@ -41,7 +38,7 @@ class GUIController(TransmittingController):
         fixture = super().add_fixture(*args, **kwargs)
 
         new_fixture = GUIFixture(self.window, fixture)
-        new_fixture.pack()
+        new_fixture.pack(fill=tk.BOTH)
         self.__gui_fixtures.append(new_fixture)
 
         return fixture
