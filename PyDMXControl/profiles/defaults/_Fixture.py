@@ -28,17 +28,17 @@ class Channel:
         self.__timestamp = datetime.utcnow()
 
     def set(self, value: int):
-        self.flush_queue.append(value)
+        self.flush_values.append(value)
 
         if self.parked is False:
             self.__updated()
 
-    flush_queue = []
+    flush_values = []
     def flush(self):
         # TODO: maybe change this algorithm for different blend types
-        if self.flush_queue != []:
-            self.__value = max(self.flush_queue)
-            self.flush_queue = []
+        if self.flush_values != []:
+            self.__value = max(self.flush_values)
+            self.flush_values = []
 
     @property
     def value(self) -> Tuple[int, datetime]:
