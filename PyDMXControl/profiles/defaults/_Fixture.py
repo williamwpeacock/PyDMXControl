@@ -23,6 +23,7 @@ class Channel:
         self.__value = 0
         self.__timestamp = datetime.utcnow()
         self.__parked = parked if parked is False else (0 if parked is True else parked)
+        self.flush_values = []
 
     def __updated(self):
         self.__timestamp = datetime.utcnow()
@@ -33,7 +34,6 @@ class Channel:
         if self.parked is False:
             self.__updated()
 
-    flush_values = []
     def flush(self):
         # TODO: maybe change this algorithm for different blend types
         if self.flush_values != []:
