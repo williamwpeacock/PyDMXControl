@@ -2,9 +2,9 @@ from typing import List
 
 class Animation:
 
-    def __init__(self, fixture: 'Fixture', length: float):
+    def __init__(self, fixtures, length: float):
         # The fixture effect is applied to
-        self.fixture = fixture
+        self.fixtures = fixtures
 
         # length in bars
         self.length = length

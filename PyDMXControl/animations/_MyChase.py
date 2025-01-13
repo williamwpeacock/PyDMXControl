@@ -1,9 +1,9 @@
 from math import ceil, floor
 
-from ..PyDMXControl.utils.exceptions import MissingArgumentException, InvalidArgumentException
+from ..utils.exceptions import MissingArgumentException, InvalidArgumentException
 
-from ..PyDMXControl import Colors
-from ..PyDMXControl.effects.Custom import Animation
+from .. import Colors
+from ..animations import Animation
 
 class MyChase(Animation):
 
