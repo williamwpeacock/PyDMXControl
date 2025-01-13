@@ -149,10 +149,6 @@ class FixtureHelpers:
             self.controller.ticker.remove_callback(callback)
         self.__callbacks = []
 
-    def flush(self):
-        for chan in self.__channels:
-            chan.flush()
-
 class Fixture(FixtureHelpers):
 
     def __init__(self, *args, **kwargs):
@@ -413,3 +409,7 @@ class Fixture(FixtureHelpers):
         self.__effects = []
 
         return self
+
+    def flush(self):
+        for chan in self.__channels:
+            chan.flush()

@@ -197,7 +197,7 @@ class Controller(ControllerHelpers):
         return self.__frame
 
     def flush(self):
-        for fixture in self.__fixtures:
+        for fixture in self.__fixtures.values():
             fixture.flush()
 
     @property
