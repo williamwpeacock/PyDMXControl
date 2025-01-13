@@ -30,13 +30,11 @@ class Callback:
 
 class AnimationCallback:
 
-    def __init__(self, callback, start, end, source):
-        if not callable(callback):
-            raise InvalidArgumentException('callback', 'Not callable')
-
-        self.callback = callback
+    def __init__(self, animation, start, end, repeat, source):
+        self.animation = animation
         self.start = start
         self.end = end
+        self.repeat = repeat
         self.source = source
 
 
@@ -88,9 +86,17 @@ class Ticker:
 
         for animation in self.__animations:
             if animation.start < self.millis_now() and self.millis_now() < animation.end:
-                animation.callback(self.bars_now())
-            # elif self.millis_now() >= animation.end:
-            #     animation.stop()
+                animation.animation.callback(self.bars_now() - self.millis_to_bars(animation.start))
+            elif self.millis_now() >= animation.end:
+                if animation.repeat == 1:
+                    animation.animation.stop()
+                else:
+                    if animation.repeat > 1:
+                        animation.repeat -= 1
+
+                    length = self.bars_to_millis(animation.animation.length)
+                    animation.start += length
+                    animation.end += length
 
         self.__controller.flush()
 
@@ -132,14 +138,15 @@ class Ticker:
         if len(idx):
             del self.__callbacks[idx[0]]
 
-    def add_animation(self, animation: Animation, start_later: bool, start_offset: float = 1):
-        total_offset = (start_later * animation.length) + start_offset
-        start = self.millis_now() - self.bars_to_millis((self.bars_now() % animation.length) - total_offset)
+    def add_animation(self, animation: Animation, start_offset: float = 0, snap: bool = True, repeat: int = 1):
+        now = int(self.bars_now()) if snap else self.bars_now()
+        start = self.bars_to_millis(now + start_offset)
         end = start + self.bars_to_millis(animation.length)
-        self.__animations.append(AnimationCallback(animation.callback, start, end, getframeinfo(stack()[1][0])))
 
-    def remove_animation(self, animation: Animation, now: float):
-        self.__animations.remove(animation)
+        self.__animations.append(AnimationCallback(animation, start, end, repeat, getframeinfo(stack()[1][0])))
+
+    def remove_animation(self, animation: Animation):
+        self.__animations = list(filter(lambda x: x.animation != animation, self.__animations))
 
     def clear_callbacks(self):
         self.__callbacks = []

@@ -2,9 +2,9 @@ from typing import List
 
 class Animation:
 
-    def __init__(self, fixtures, length: float):
+    def __init__(self, fixture, length: float):
         # The fixture effect is applied to
-        self.fixtures = fixtures
+        self.fixture = fixture
 
         # length in bars
         self.length = length
@@ -33,6 +33,6 @@ class Animation:
         self.__animating = False
         self.fixture.controller.ticker.remove_animation(self)
 
-    def start(self, start_offset: float = 0):
+    def start(self, start_offset: float = 0, snap: bool = True, repeat: int = 1):
         self.__animating = True
-        self.fixture.controller.ticker.add_animation(self, 0, start_offset)
+        self.fixture.controller.ticker.add_animation(self, start_offset, snap, repeat)
