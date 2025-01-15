@@ -1,20 +1,15 @@
 from typing import List
 
+from .. import Colors
+
 class Animation:
 
-    def __init__(self, fixture, length: float):
-        # The fixture effect is applied to
-        self.fixture = fixture
-
+    def __init__(self, length: float):
         # length in bars
         self.length = length
 
-        # Animating flag for ticker
-        self.__animating = False
-
     def __callback(self, now: float):
-        if self.__animating:
-            self.callback(now)
+        self.callback(now)
 
     def callback(self, now: float):
         pass
@@ -30,9 +25,11 @@ class Animation:
         return (self.local_pos(absolute_pos) / self.length)
 
     def stop(self):
-        self.__animating = False
-        self.fixture.controller.ticker.remove_animation(self)
+        pass
 
-    def start(self, start_offset: float = 0, snap: bool = True, repeat: int = 1):
-        self.__animating = True
-        self.fixture.controller.ticker.add_animation(self, start_offset, snap, repeat)
+    def start(self, controller, start_offset: float = 0, snap: bool = True, repeat: int = 1):
+        return controller.ticker.add_animation(self, start_offset, snap, repeat)
+
+    @staticmethod
+    def linear_color_mix(xy0, xy1, x_):
+        return Colors.mix(xy1[1], xy0[1], (x_ - xy0[0]) / (xy1[0] - xy0[0]))

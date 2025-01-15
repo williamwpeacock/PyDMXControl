@@ -17,6 +17,8 @@ from ... import DEFAULT_INTERVAL
 from ...effects.defaults import Effect
 from ...animations import Animation
 
+import math
+
 class Callback:
 
     def __init__(self, callback, interval, last, source):
@@ -36,7 +38,7 @@ class AnimationCallback:
         self.end = end
         self.repeat = repeat
         self.source = source
-
+        self.playing = True
 
 class Ticker:
 
@@ -87,16 +89,15 @@ class Ticker:
         for animation in self.__animations:
             if animation.start < self.millis_now() and self.millis_now() < animation.end:
                 animation.animation.callback(self.bars_now() - self.millis_to_bars(animation.start))
-            elif self.millis_now() >= animation.end:
-                if animation.repeat == 1:
-                    animation.animation.stop()
-                else:
-                    if animation.repeat > 1:
-                        animation.repeat -= 1
+            elif animation.end <= self.millis_now():
+                if animation.repeat != 1:
+                    delay = self.millis_to_bars(self.millis_now() - animation.end)
+                    num_missed = math.floor(delay / animation.animation.length)
+                    if animation.repeat < 1 or (animation.repeat > 1 and animation.repeat - (1 + num_missed) >= 1):
+                        animation.animation.start(self.__controller, - (delay % animation.animation.length), False, animation.repeat - (1 + num_missed))
 
-                    length = self.bars_to_millis(animation.animation.length)
-                    animation.start += length
-                    animation.end += length
+                animation.animation.stop()
+                self.remove_animation(animation)
 
         self.__controller.flush()
 
@@ -139,14 +140,17 @@ class Ticker:
             del self.__callbacks[idx[0]]
 
     def add_animation(self, animation: Animation, start_offset: float = 0, snap: bool = True, repeat: int = 1):
-        now = int(self.bars_now()) if snap else self.bars_now()
+        now = math.round(self.bars_now()) if snap else self.bars_now()
         start = self.bars_to_millis(now + start_offset)
         end = start + self.bars_to_millis(animation.length)
 
-        self.__animations.append(AnimationCallback(animation, start, end, repeat, getframeinfo(stack()[1][0])))
+        anim_callback = AnimationCallback(animation, start, end, repeat, getframeinfo(stack()[1][0]))
 
-    def remove_animation(self, animation: Animation):
-        self.__animations = list(filter(lambda x: x.animation != animation, self.__animations))
+        self.__animations.append(anim_callback)
+        return anim_callback
+
+    def remove_animation(self, animation: AnimationCallback):
+        self.__animations = list(filter(lambda x: x != animation, self.__animations))
 
     def clear_callbacks(self):
         self.__callbacks = []
