@@ -228,11 +228,13 @@ def park(fid: int):
 def callback(cb: str):
     if cb not in current_app.parent.callbacks.keys():
         return jsonify({"error": "Callback {} not found".format(cb)}), 404
-    try:
-        current_app.parent.callbacks[cb]()
-    except Exception:
-        return jsonify({"error": "Callback {} failed to execute".format(cb)}), 500
+    current_app.parent.callbacks[cb]()
     return jsonify({"message": "Callback {} executed".format(cb)}), 200
+    # try:
+    #     current_app.parent.callbacks[cb]()
+    # except Exception:
+    #     return jsonify({"error": "Callback {} failed to execute".format(cb)}), 500
+    # return jsonify({"message": "Callback {} executed".format(cb)}), 200
 
 
 # Timed Events
