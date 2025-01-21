@@ -12,12 +12,17 @@ class CompoundAnimation(Animation):
 
         super().__init__(length, *args, **kwargs)
 
-    def start(self, controller, start_offset: float = 0, snap: bool = True, repeat: int = 1):
+    def start(self, controller, setting_func, start_offset: float = 0, snap: bool = True, repeat: int = 1):
         for anim in self.animations:
-            anim[0].start(controller, start_offset + anim[1], anim[2], anim[3])
-        super().start(controller, start_offset, snap, repeat)
+            anim[0].start(controller, anim[1], start_offset + anim[2], anim[3], anim[4])
+        super().start(controller, setting_func, start_offset, snap, repeat)
+
+    def start_at(self, controller, setting_func, start_time: float = 0, repeat: int = 1):
+        for anim in self.animations:
+            anim[0].start_at(controller, anim[1], start_time + anim[2], anim[4])
+        super().start_at(controller, setting_func, start_time, repeat)
 
     def stop(self):
         for anim in self.animations:
             anim[0].stop()
-        super().stop()
+        return None

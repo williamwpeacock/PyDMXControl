@@ -32,13 +32,41 @@ class Callback:
 
 class AnimationCallback:
 
-    def __init__(self, animation, start, end, repeat, source):
+    def __init__(self, animation, setting_func, start, end, repeat, source):
         self.animation = animation
+        self.setting_func = setting_func
         self.start = start
         self.end = end
         self.repeat = repeat
         self.source = source
         self.playing = True
+
+    def callback(self, now):
+        result = self.animation.callback(now)
+        if self.setting_func:
+            self.setting_func(result)
+
+    def stop(self):
+        final_result = self.animation.stop()
+        if self.setting_func:
+            self.setting_func(final_result)
+
+    def restart(self, controller, delay, force = False):
+        num_missed = math.floor(delay / self.animation.length)
+        if force:
+            self.animation.start(
+                controller,
+                self.setting_func,
+                0,
+                self.repeat
+            )
+        elif self.repeat < 1 or (self.repeat > 1 and self.repeat - (1 + num_missed) >= 1):
+            self.animation.start_at(
+                controller,
+                self.setting_func,
+                controller.ticker.millis_to_bars(self.end) + (self.animation.length * num_missed),
+                self.repeat - (1 + num_missed)
+            )
 
 class Ticker:
 
@@ -48,15 +76,15 @@ class Ticker:
 
     def bars_now(self) -> float:
         return self.millis_to_bars(self.millis_now())
-
-    def relative_bars_to_millis(self, bars: float) -> float:
-        return self.bars_to_millis(bars) + self.__start_millis
+    
+    def relative_millis_now(self):
+        return self.millis_now() - self.__start_millis
+    
+    def relative_bars_now(self):
+        return self.millis_to_bars(self.relative_millis_now())
 
     def bars_to_millis(self, bars: float) -> float:
         return ((bars * 4 * 60 * 1000) / self.__bpm)
-
-    def relative_millis_to_bars(self, millis: float) -> float:
-        return self.millis_to_bars(millis - self.__start_millis)
 
     def millis_to_bars(self, millis: float) -> float:
         return ((millis * self.__bpm) / (60 * 1000 * 4))
@@ -87,16 +115,13 @@ class Ticker:
                 callback.last = callback.last + callback.interval
 
         for animation in self.__animations:
-            if animation.start < self.millis_now() and self.millis_now() < animation.end:
-                animation.animation.callback(self.bars_now() - self.millis_to_bars(animation.start))
-            elif animation.end <= self.millis_now():
-                if animation.repeat != 1:
-                    delay = self.millis_to_bars(self.millis_now() - animation.end)
-                    num_missed = math.floor(delay / animation.animation.length)
-                    if animation.repeat < 1 or (animation.repeat > 1 and animation.repeat - (1 + num_missed) >= 1):
-                        animation.animation.start(self.__controller, - (delay % animation.animation.length), False, animation.repeat - (1 + num_missed))
+            if animation.start <= self.relative_millis_now() and animation.end > self.relative_millis_now():
+                animation.callback(self.relative_bars_now() - self.millis_to_bars(animation.start))
 
-                animation.animation.stop()
+            elif animation.end <= self.relative_millis_now():
+                animation.stop()
+                delay = self.millis_to_bars(self.relative_millis_now() - animation.end)
+                animation.restart(self.__controller, delay)
                 self.remove_animation(animation)
 
         self.__controller.flush()
@@ -139,12 +164,15 @@ class Ticker:
         if len(idx):
             del self.__callbacks[idx[0]]
 
-    def add_animation(self, animation: Animation, start_offset: float = 0, snap: bool = True, repeat: int = 1):
-        now = math.round(self.bars_now()) if snap else self.bars_now()
-        start = self.bars_to_millis(now + start_offset)
+    def add_animation(self, animation: Animation, setting_func, start_offset: float = 0, snap: bool = True, repeat: int = 1):
+        now = round(self.relative_bars_now()) if snap else self.relative_bars_now()
+        return self.add_animation_at(animation, setting_func, now + start_offset, repeat)
+    
+    def add_animation_at(self, animation, setting_func, start_time, repeat):
+        start = self.bars_to_millis(start_time)
         end = start + self.bars_to_millis(animation.length)
 
-        anim_callback = AnimationCallback(animation, start, end, repeat, getframeinfo(stack()[1][0]))
+        anim_callback = AnimationCallback(animation, setting_func, start, end, repeat, getframeinfo(stack()[1][0]))
 
         self.__animations.append(anim_callback)
         return anim_callback
@@ -179,16 +207,11 @@ class Ticker:
 
     def nudge(self, ms):
         self.__start_millis += ms
-        for callback in self.__callbacks:
-            callback.last += ms
-            cb_parent_instance = callback.__self__
-            if isinstance(cb_parent_instance, Effect):
-                cb_parent_instance.nudge(ms)
+        # nudge animations
 
     def sync(self):
         self.__start_millis = self.millis_now()
-        for callback in self.__callbacks:
-            callback.last = self.__start_millis
-            cb_parent_instance = callback.__self__
-            if isinstance(cb_parent_instance, Effect):
-                cb_parent_instance.source.sync(self.__start_millis)
+        for anim in self.__animations:
+            anim.stop()
+            anim.restart(self.__controller, 0, True)
+
