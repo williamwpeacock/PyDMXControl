@@ -2,11 +2,11 @@ from . import Animation
 
 class CompoundAnimation(Animation):
 
-    def __init__(self, animations, *args, **kwargs):
-        length = 0
-        for anim in animations:
-            length = max(length, anim[1] + (anim[0].length * anim[3]))
-            # length = max(length, start_time + anim.length)
+    def __init__(self, animations, length = None, *args, **kwargs):
+        if length == None:
+            length = 0
+            for anim in animations:
+                length = max(length, anim[2] + (anim[0].length * anim[4]))
 
         self.animations = animations
 
