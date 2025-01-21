@@ -20,46 +20,74 @@ for light in dmx.get_all_fixtures():
 #     Pulse(lights[3], Colors.White, 0.1, 0.25).start(start_offset = 1.5, snap = False, repeat=2)
 
 def generic_anim():
-    pulse_0 = GenericAnimation(lights[0].color, [(0, Colors.Black), (0.1, Colors.Red), (0.25, Colors.Black)], [Animation.linear_color_mix, Animation.linear_color_mix])
-    pulse_1 = GenericAnimation(lights[1].color, [(0, Colors.Black), (0.1, Colors.Red), (0.25, Colors.Black)], [Animation.linear_color_mix, Animation.linear_color_mix])
-    pulse_2 = GenericAnimation(lights[2].color, [(0, Colors.Black), (0.1, Colors.Red), (0.25, Colors.Black)], [Animation.linear_color_mix, Animation.linear_color_mix])
-    pulse_3 = GenericAnimation(lights[3].color, [(0, Colors.Black), (0.1, Colors.Red), (0.25, Colors.Black)], [Animation.linear_color_mix, Animation.linear_color_mix])
-    strobe_0 = GenericAnimation(lights[0].color, [(0, Colors.White), (0.05, Colors.White), (0.05, Colors.Black), (0.1, Colors.Black)], [Animation.linear_color_mix, Animation.linear_color_mix, Animation.linear_color_mix])
-    strobe_1 = GenericAnimation(lights[1].color, [(0, Colors.White), (0.05, Colors.White), (0.05, Colors.Black), (0.1, Colors.Black)], [Animation.linear_color_mix, Animation.linear_color_mix, Animation.linear_color_mix])
-    strobe_2 = GenericAnimation(lights[2].color, [(0, Colors.White), (0.05, Colors.White), (0.05, Colors.Black), (0.1, Colors.Black)], [Animation.linear_color_mix, Animation.linear_color_mix, Animation.linear_color_mix])
-    strobe_3 = GenericAnimation(lights[3].color, [(0, Colors.White), (0.05, Colors.White), (0.05, Colors.Black), (0.1, Colors.Black)], [Animation.linear_color_mix, Animation.linear_color_mix, Animation.linear_color_mix])
+    pulse_0 = GenericAnimation([(0, Colors.Black), (0.1, Colors.Red), (0.25, Colors.Black)], [Animation.linear_color_mix, Animation.linear_color_mix])
+    strobe_0 = GenericAnimation([(0, Colors.White), (0.05, Colors.White), (0.05, Colors.Black), (0.1, Colors.Black)], [Animation.linear_color_mix, Animation.linear_color_mix, Animation.linear_color_mix])
+    
+    CompoundAnimation([(pulse_0, lights[0].color, 0, False, 1), (pulse_0, lights[2].color, 0.25, False, 1),
+                       (pulse_0, lights[1].color, 0.5, False, 1), (pulse_0, lights[3].color, 0.75, False, 1),
+                       (pulse_0, lights[2].color, 1, False, 1), (pulse_0, lights[0].color, 1.25, False, 1),
+                       (pulse_0, lights[3].color, 1.5, False, 1), (pulse_0, lights[1].color, 1.75, False, 1),
+                       (pulse_0, lights[0].color, 2, False, 1), (pulse_0, lights[1].color, 2, False, 1),
+                       (pulse_0, lights[2].color, 2, False, 1), (pulse_0, lights[3].color, 2, False, 1),
+                       (strobe_0, lights[0].color, 2.5, False, 10), (strobe_0, lights[1].color, 2.5, False, 10),
+                       (strobe_0, lights[2].color, 2.5, False, 10), (strobe_0, lights[3].color, 2.5, False, 10),
+                       (pulse_0, lights[0].color, 3.5, False, 1), (pulse_0, lights[1].color, 3.5, False, 1),
+                       (pulse_0, lights[2].color, 3.75, False, 1), (pulse_0, lights[3].color, 3.75, False, 1),
+                       (pulse_0, lights[0].color, 4, False, 1), (pulse_0, lights[1].color, 4, False, 1),
+                       (pulse_0, lights[2].color, 4, False, 1), (pulse_0, lights[3].color, 4, False, 1),
+                       (strobe_0, lights[0].color, 4.5, False, 10), (strobe_0, lights[1].color, 4.5, False, 10),
+                       (strobe_0, lights[2].color, 4.5, False, 10), (strobe_0, lights[3].color, 4.5, False, 10),
+                       (pulse_0, lights[0].color, 5.5, False, 1), (pulse_0, lights[2].color, 5.5, False, 1),
+                       (pulse_0, lights[1].color, 5.75, False, 1), (pulse_0, lights[3].color, 5.75, False, 1),
+                       (pulse_0, lights[0].color, 6, False, 1), (pulse_0, lights[1].color, 6, False, 1),
+                       (pulse_0, lights[2].color, 6, False, 1), (pulse_0, lights[3].color, 6, False, 1),
+                       (pulse_0, lights[0].color, 6.25, False, 1), (pulse_0, lights[1].color, 6.333, False, 1),
+                       (pulse_0, lights[2].color, 6.417, False, 1),
+                       (pulse_0, lights[0].color, 6.5, False, 1), (pulse_0, lights[1].color, 6.5, False, 1),
+                       (pulse_0, lights[2].color, 6.75, False, 1), (pulse_0, lights[3].color, 6.75, False, 1),
+                       (pulse_0, lights[0].color, 7, False, 1), (pulse_0, lights[1].color, 7, False, 1),
+                       (pulse_0, lights[2].color, 7.25, False, 1), (pulse_0, lights[3].color, 7.25, False, 1),
+    ]).start(dmx, None, 0, False, 1)
 
-    CompoundAnimation([(pulse_0, 0, False, 1), (pulse_2, 0.25, False, 1),
-                       (pulse_1, 0.5, False, 1), (pulse_3, 0.75, False, 1),
-                       (pulse_2, 1, False, 1), (pulse_0, 1.25, False, 1),
-                       (pulse_3, 1.5, False, 1), (pulse_1, 1.75, False, 1),
-                       (pulse_0, 2, False, 1), (pulse_1, 2, False, 1),
-                       (pulse_2, 2, False, 1), (pulse_3, 2, False, 1),
-                       (strobe_0, 2.5, False, 10), (strobe_1, 2.5, False, 10),
-                       (strobe_2, 2.5, False, 10), (strobe_3, 2.5, False, 10),
-                       (pulse_0, 3.5, False, 1), (pulse_1, 3.5, False, 1),
-                       (pulse_2, 3.75, False, 1), (pulse_3, 3.75, False, 1),
-                       (pulse_0, 4, False, 1), (pulse_1, 4, False, 1),
-                       (pulse_2, 4, False, 1), (pulse_3, 4, False, 1),
-                       (strobe_0, 4.5, False, 10), (strobe_1, 4.5, False, 10),
-                       (strobe_2, 4.5, False, 10), (strobe_3, 4.5, False, 10),
-                       (pulse_0, 5.5, False, 1), (pulse_2, 5.5, False, 1),
-                       (pulse_1, 5.75, False, 1), (pulse_3, 5.75, False, 1),
-                       (pulse_0, 6, False, 1), (pulse_1, 6, False, 1),
-                       (pulse_2, 6, False, 1), (pulse_3, 6, False, 1),
-                       (pulse_0, 6.25, False, 1), (pulse_1, 6.333, False, 1),
-                       (pulse_2, 6.417, False, 1),
-                       (pulse_0, 6.5, False, 1), (pulse_1, 6.5, False, 1),
-                       (pulse_2, 6.75, False, 1), (pulse_3, 6.75, False, 1),
-                       (pulse_0, 7, False, 1), (pulse_1, 7, False, 1),
-                       (pulse_2, 7.25, False, 1), (pulse_3, 7.25, False, 1),
-    ]).start(dmx, 0, False, 1)
+def syncopated():
+    flash = GenericAnimation([(0, Colors.Black), (0.05, Colors.White), (0.1, Colors.mix(Colors.Black, Colors.White, 0.15)), (0.15, Colors.Black)], [Animation.linear_color_mix, Animation.linear_color_mix, Animation.linear_color_mix])
+
+    CompoundAnimation([(flash, lights[0].color, 0, False, 1),
+                       (CompoundAnimation([(flash, lights[3].color, 0, False, 1)], 0.5), None, 0.25, False, 2),
+                       (flash, lights[0].color, 0.625, False, 1),
+    ], 1).start(dmx, None, 0, False, -1)
+
+def normal():
+    flash = GenericAnimation([(0, Colors.Black), (0.05, Colors.White), (0.1, Colors.mix(Colors.Black, Colors.White, 0.15)), (0.15, Colors.Black)], [Animation.linear_color_mix, Animation.linear_color_mix, Animation.linear_color_mix])
+
+    CompoundAnimation([(flash, lights[0].color, 0, False, 1),
+                       (flash, lights[1].color, 0.25, False, 1),
+    ], 0.5).start(dmx, None, 0, True, -1)
+
+
+def stop_animations():
+    dmx.ticker.stop_animations()
+
+def nudge_back():
+    dmx.ticker.nudge(-50)
+    
+def nudge_forward():
+    dmx.ticker.nudge(50)
+
+def sync():
+    dmx.ticker.sync()
 
 anims = {
-    "generic_anim": generic_anim
+    "generic_anim": generic_anim,
+    "syncopated": syncopated,
+    "normal": normal,
+    "stop_animations": stop_animations,
+    "nudge_back": nudge_back,
+    "nudge_forward": nudge_forward,
+    "sync": sync, 
 }
 
-dmx.ticker.set_bpm(174)
+dmx.ticker.set_bpm(160)
 
 dmx.web_control(port=8080, callbacks=anims)
 dmx.sleep_till_enter()
