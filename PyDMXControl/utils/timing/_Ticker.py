@@ -68,6 +68,10 @@ class AnimationCallback:
                 self.repeat - (1 + num_missed)
             )
 
+    def nudge(self, ms):
+        self.start += ms
+        self.end += ms
+
 class Ticker:
 
     @staticmethod
@@ -76,10 +80,10 @@ class Ticker:
 
     def bars_now(self) -> float:
         return self.millis_to_bars(self.millis_now())
-    
+
     def relative_millis_now(self):
         return self.millis_now() - self.__start_millis
-    
+
     def relative_bars_now(self):
         return self.millis_to_bars(self.relative_millis_now())
 
@@ -167,7 +171,7 @@ class Ticker:
     def add_animation(self, animation: Animation, setting_func, start_offset: float = 0, snap: bool = True, repeat: int = 1):
         now = round(self.relative_bars_now()) if snap else self.relative_bars_now()
         return self.add_animation_at(animation, setting_func, now + start_offset, repeat)
-    
+
     def add_animation_at(self, animation, setting_func, start_time, repeat):
         start = self.bars_to_millis(start_time)
         end = start + self.bars_to_millis(animation.length)
@@ -210,11 +214,13 @@ class Ticker:
 
     def nudge(self, ms):
         self.__start_millis += ms
-        # nudge animations
+        for anim in self.__animations:
+            anim.nudge(ms)
 
     def sync(self):
         self.__start_millis = self.millis_now()
         for anim in self.__animations:
             anim.stop()
             anim.restart(self.__controller, 0, True)
+            # TODO: only restart master animations
 
