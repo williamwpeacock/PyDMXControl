@@ -22,7 +22,7 @@ for light in dmx.get_all_fixtures():
 def generic_anim():
     pulse_0 = GenericAnimation([(0, Colors.Black), (0.1, Colors.Red), (0.25, Colors.Black)], [Animation.linear_color_mix, Animation.linear_color_mix])
     strobe_0 = GenericAnimation([(0, Colors.White), (0.05, Colors.White), (0.05, Colors.Black), (0.1, Colors.Black)], [Animation.linear_color_mix, Animation.linear_color_mix, Animation.linear_color_mix])
-    
+
     CompoundAnimation([(pulse_0, lights[0].color, 0, False, 1), (pulse_0, lights[2].color, 0.25, False, 1),
                        (pulse_0, lights[1].color, 0.5, False, 1), (pulse_0, lights[3].color, 0.75, False, 1),
                        (pulse_0, lights[2].color, 1, False, 1), (pulse_0, lights[0].color, 1.25, False, 1),
@@ -58,11 +58,11 @@ def syncopated():
     ], 1).start(dmx, None, 0, False, -1)
 
 def normal():
-    flash = GenericAnimation([(0, Colors.Black), (0.05, Colors.White), (0.1, Colors.mix(Colors.Black, Colors.White, 0.15)), (0.15, Colors.Black)], [Animation.linear_color_mix, Animation.linear_color_mix, Animation.linear_color_mix])
+    flash = GenericAnimation([(0, Colors.Red), (0.05, Colors.White), (0.1, Colors.mix(Colors.Black, Colors.Red, 0.15)), (0.15, Colors.Red)], [Animation.linear_color_mix, Animation.linear_color_mix, Animation.linear_color_mix])
 
     CompoundAnimation([(flash, lights[0].color, 0, False, 1),
                        (flash, lights[1].color, 0.25, False, 1),
-    ], 0.5).start(dmx, None, 0, True, -1)
+    ], 0.5).start(dmx, None, 0, False, -1)
 
 
 def stop_animations():
@@ -70,7 +70,7 @@ def stop_animations():
 
 def nudge_back():
     dmx.ticker.nudge(-50)
-    
+
 def nudge_forward():
     dmx.ticker.nudge(50)
 
@@ -84,10 +84,10 @@ anims = {
     "stop_animations": stop_animations,
     "nudge_back": nudge_back,
     "nudge_forward": nudge_forward,
-    "sync": sync, 
+    "sync": sync,
 }
 
-dmx.ticker.set_bpm(160)
+dmx.ticker.set_bpm(176)
 
 dmx.web_control(port=8080, callbacks=anims)
 dmx.sleep_till_enter()
