@@ -31,7 +31,7 @@ class Animation:
         return controller.ticker.add_animation(self, setting_func, start_offset, snap, repeat)
     
     def start_at(self, controller, setting_func, start_time, repeat):
-        return controller.ticker.add_animation(self, setting_func, start_time, repeat)
+        return controller.ticker.add_animation_at(self, setting_func, start_time, repeat)
 
     @staticmethod
     def linear_color_mix(xy0, xy1, x_):
