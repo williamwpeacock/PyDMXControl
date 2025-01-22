@@ -87,6 +87,16 @@
                             <a href="{{ url_for('.callback', cb=name) }}" data-no-reload class="button">Run</a></td>
                     </tr>
                 {% endfor %}
+                    <tr>
+                        <td data-th="Callback Name">
+                            BPM</td>
+                        <td data-th="Run">
+                            <form id="bpm">
+                                <input id="bpm_value" name="bpm_value" type="number" min="0" max="1000" step="1" value="{{ controller.ticker.get_bpm() }}" required/>
+                                <input type="submit" value="Update" id="submit" name="submit"/>
+                            </form>
+                        </td>
+                    <tr>
                 </tbody>
             </table>
         </article>
@@ -158,6 +168,11 @@
 
         document.getElementById("intensity_value").addEventListener("input", function (e) {
             input_change(true);
+        });
+
+        document.getElementById("bpm").addEventListener("submit", function (e) {
+            e.preventDefault();
+            get("http://localhost:8080/set_bpm/" + encodeURIComponent(Math.floor(document.getElementById("bpm_value").value)) + "/0");
         });
     </script>
 {% endblock script %}

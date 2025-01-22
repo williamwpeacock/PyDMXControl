@@ -305,7 +305,7 @@ def bulk_change(ids: str, values: str):
         this_fixture = current_app.parent.controller.get_fixture(fid)
         if not this_fixture:
             return jsonify({"error": "Fixture {} not found".format(fid)}), 404
-        
+
         channels_list = this_fixture.channels
         values_list = values.split('_')
 
@@ -315,8 +315,17 @@ def bulk_change(ids: str, values: str):
         this_fixture.set_channels(values_list)
 
     data = {
-        "message": "Updated all selected fixtures.",
-        "elements": {
-        }
+        "message": "Updated all selected fixtures."
+    }
+    return jsonify(data), 200
+
+@routes.route('set_bpm/<string:bpm_0>/<string:bpm_1>', methods=['GET'])
+def set_bpm(bpm_0: int, bpm_1: int):
+    new_bpm = float(".".join([bpm_0, bpm_1]))
+
+    current_app.parent.controller.ticker.set_bpm(new_bpm)
+
+    data = {
+        "message": "Set BPM to {}.".format(new_bpm)
     }
     return jsonify(data), 200

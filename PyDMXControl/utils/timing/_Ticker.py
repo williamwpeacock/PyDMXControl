@@ -186,6 +186,9 @@ class Ticker:
     def set_bpm(self, bpm: int):
         self.__bpm = bpm
 
+    def get_bpm(self):
+        return self.__bpm
+
     def stop(self):
         # Stop the threaded loop
         self.__ticking = False
