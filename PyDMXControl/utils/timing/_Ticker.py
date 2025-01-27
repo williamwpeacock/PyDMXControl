@@ -64,7 +64,7 @@ class AnimationCallback:
             self.animation.start_at(
                 controller,
                 self.setting_func,
-                controller.ticker.millis_to_bars(self.end) + (self.animation.length * num_missed),
+                self.end + (self.animation.length * num_missed),
                 self.repeat - (1 + num_missed)
             )
 
@@ -119,12 +119,12 @@ class Ticker:
                 callback.last = callback.last + callback.interval
 
         for animation in self.__animations:
-            if animation.start <= self.relative_millis_now() and animation.end > self.relative_millis_now():
-                animation.callback(self.relative_bars_now() - self.millis_to_bars(animation.start))
+            if animation.start <= self.relative_bars_now() and animation.end > self.relative_bars_now():
+                animation.callback(self.relative_bars_now() - animation.start)
 
-            elif animation.end <= self.relative_millis_now():
+            elif animation.end <= self.relative_bars_now():
                 animation.stop()
-                delay = self.millis_to_bars(self.relative_millis_now() - animation.end)
+                delay = self.relative_bars_now() - animation.end
                 animation.restart(self.__controller, delay)
                 self.remove_animation(animation)
 
@@ -172,9 +172,8 @@ class Ticker:
         now = round(self.relative_bars_now()) if snap else self.relative_bars_now()
         return self.add_animation_at(animation, setting_func, now + start_offset, repeat)
 
-    def add_animation_at(self, animation, setting_func, start_time, repeat):
-        start = self.bars_to_millis(start_time)
-        end = start + self.bars_to_millis(animation.length)
+    def add_animation_at(self, animation, setting_func, start, repeat):
+        end = start + animation.length
 
         anim_callback = AnimationCallback(animation, setting_func, start, end, repeat, getframeinfo(stack()[1][0]))
 
@@ -215,7 +214,7 @@ class Ticker:
     def nudge(self, ms):
         self.__start_millis += ms
         for anim in self.__animations:
-            anim.nudge(ms)
+            anim.nudge(self.millis_to_bars(ms))
 
     def sync(self):
         self.__start_millis = self.millis_now()
