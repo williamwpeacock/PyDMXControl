@@ -282,6 +282,11 @@ class Controller(ControllerHelpers):
             self.web.stop()
             print("CLOSE: web controller stopped")
 
+    def add_animation(self, animation, setting_func, start_offset: float = 0, snap: bool = True, repeat: int = 1):
+        return self.ticker.add_animation(animation, setting_func, start_offset, snap, repeat)
+
+    def add_animation_at(self, animation, setting_func, start_time, repeat):
+        return self.ticker.add_animation_at(animation, setting_func, start_time, repeat)
 
 class JSONLoadSave:
 

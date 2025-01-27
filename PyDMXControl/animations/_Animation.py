@@ -27,11 +27,11 @@ class Animation:
     def stop(self):
         pass
 
-    def start(self, controller, setting_func, start_offset: float = 0, snap: bool = True, repeat: int = 1):
-        return controller.ticker.add_animation(self, setting_func, start_offset, snap, repeat)
-    
-    def start_at(self, controller, setting_func, start_time, repeat):
-        return controller.ticker.add_animation_at(self, setting_func, start_time, repeat)
+    def start(self, parent, setting_func, start_offset: float = 0, snap: bool = True, repeat: int = 1):
+        return parent.add_animation(self, setting_func, start_offset, snap, repeat)
+
+    def start_at(self, parent, setting_func, start_time, repeat):
+        return parent.add_animation_at(self, setting_func, start_time, repeat)
 
     @staticmethod
     def linear_color_mix(xy0, xy1, x_):

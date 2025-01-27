@@ -12,15 +12,20 @@ class CompoundAnimation(Animation):
 
         super().__init__(length, *args, **kwargs)
 
-    def start(self, controller, setting_func, start_offset: float = 0, snap: bool = True, repeat: int = 1):
-        for anim in self.animations:
-            anim[0].start(controller, anim[1], start_offset + anim[2], anim[3], anim[4])
-        super().start(controller, setting_func, start_offset, snap, repeat)
+    def start(self, parent, setting_func, start_offset: float = 0, snap: bool = True, repeat: int = 1):
+        cb = super().start(parent, setting_func, start_offset, snap, repeat)
+        self.start_children(cb)
 
-    def start_at(self, controller, setting_func, start_time: float = 0, repeat: int = 1):
+    def start_at(self, parent, setting_func, start_time: float = 0, repeat: int = 1):
+        cb = super().start_at(parent, setting_func, start_time, repeat)
+        self.start_children(cb)
+
+    def start_children(self, cb):
         for anim in self.animations:
-            anim[0].start_at(controller, anim[1], start_time + anim[2], anim[4])
-        super().start_at(controller, setting_func, start_time, repeat)
+            if len(anim) == 4:
+                anim[0].start_at(cb, anim[1], anim[2], anim[3])
+            elif len(anim) == 5:
+                anim[0].start(cb, anim[1], anim[2], anim[3], anim[4])
 
     def stop(self):
         for anim in self.animations:

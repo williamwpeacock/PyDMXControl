@@ -39,30 +39,46 @@ class AnimationCallback:
         self.end = end
         self.repeat = repeat
         self.source = source
-        self.playing = True
 
+        self.children = []
+
+    # now is not so now anymore...
     def callback(self, now):
         result = self.animation.callback(now)
         if self.setting_func:
             self.setting_func(result)
+
+        for child in self.children:
+            if child.start <= now and child.end > now:
+                child.callback(now - child.start)
+
+            elif child.end <= now:
+                child.stop()
+                delay = now - child.end
+                child.restart(self, delay)
+                self.remove_animation(child)
 
     def stop(self):
         final_result = self.animation.stop()
         if self.setting_func:
             self.setting_func(final_result)
 
-    def restart(self, controller, delay, force = False):
+        for child in self.children:
+            child.stop()
+
+    # parent can be AnimationCallback, Controller, or Ticker (SO STOOPID)
+    def restart(self, parent, delay, force = False):
         num_missed = math.floor(delay / self.animation.length)
         if force:
             self.animation.start(
-                controller,
+                parent,
                 self.setting_func,
                 0,
                 self.repeat
             )
         elif self.repeat < 1 or (self.repeat > 1 and self.repeat - (1 + num_missed) >= 1):
             self.animation.start_at(
-                controller,
+                parent,
                 self.setting_func,
                 self.end + (self.animation.length * num_missed),
                 self.repeat - (1 + num_missed)
@@ -71,6 +87,25 @@ class AnimationCallback:
     def nudge(self, ms):
         self.start += ms
         self.end += ms
+
+        # for child in self.children:
+        #     child.nudge()
+
+    # BAD BAD CODE - REFACTOR AT SOME POINT
+    def add_animation(self, animation, setting_func, start_offset: float = 0, snap: bool = True, repeat: int = 1):
+        return self.add_animation_at(animation, setting_func, start_offset, repeat)
+
+    def add_animation_at(self, animation, setting_func, start_time, repeat):
+        start = start_time
+        end = start + animation.length
+
+        anim_callback = AnimationCallback(animation, setting_func, start, end, repeat, getframeinfo(stack()[1][0]))
+
+        self.children.append(anim_callback)
+        return anim_callback
+
+    def remove_animation(self, animation):
+        self.children = list(filter(lambda x: x != animation, self.children))
 
 class Ticker:
 
