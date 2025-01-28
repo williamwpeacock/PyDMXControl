@@ -25,7 +25,7 @@ class Animation:
         return (self.local_pos(absolute_pos) / self.length)
 
     def stop(self):
-        pass
+        return None
 
     def start(self, parent, setting_func, start_offset: float = 0, snap: bool = True, repeat: int = 1):
         return parent.add_animation(self, setting_func, start_offset, snap, repeat)

@@ -53,27 +53,29 @@ class AnimationCallback:
                 child.callback(now - child.start)
 
             elif child.end <= now:
-                child.stop()
                 delay = now - child.end
                 child.restart(self, delay)
-                self.remove_animation(child)
 
-    def stop(self):
+    def stop(self, parent):
         final_result = self.animation.stop()
         if self.setting_func:
             self.setting_func(final_result)
 
         for child in self.children:
-            child.stop()
+            child.stop(self)
+
+        parent.remove_animation(self)
 
     # parent can be AnimationCallback, Controller, or Ticker (SO STOOPID)
     def restart(self, parent, delay, force = False):
+        self.stop(parent)
         num_missed = math.floor(delay / self.animation.length)
         if force:
             self.animation.start(
                 parent,
                 self.setting_func,
                 0,
+                False,
                 self.repeat
             )
         elif self.repeat < 1 or (self.repeat > 1 and self.repeat - (1 + num_missed) >= 1):
@@ -158,10 +160,9 @@ class Ticker:
                 animation.callback(self.relative_bars_now() - animation.start)
 
             elif animation.end <= self.relative_bars_now():
-                animation.stop()
                 delay = self.relative_bars_now() - animation.end
                 animation.restart(self.__controller, delay)
-                self.remove_animation(animation)
+                # self.remove_animation(animation)
 
         self.__controller.flush()
 
@@ -254,7 +255,9 @@ class Ticker:
     def sync(self):
         self.__start_millis = self.millis_now()
         for anim in self.__animations:
-            anim.stop()
-            anim.restart(self.__controller, 0, True)
-            # TODO: only restart master animations
+            # Still doesn't always work
+            anim.restart(self, 0, True)
 
+    def stop_animations(self):
+        for anim in self.__animations:
+            anim.stop(self)

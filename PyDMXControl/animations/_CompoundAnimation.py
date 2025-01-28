@@ -26,8 +26,3 @@ class CompoundAnimation(Animation):
                 anim[0].start_at(cb, anim[1], anim[2], anim[3])
             elif len(anim) == 5:
                 anim[0].start(cb, anim[1], anim[2], anim[3], anim[4])
-
-    def stop(self):
-        for anim in self.animations:
-            anim[0].stop()
-        return None

@@ -288,6 +288,9 @@ class Controller(ControllerHelpers):
     def add_animation_at(self, animation, setting_func, start_time, repeat):
         return self.ticker.add_animation_at(animation, setting_func, start_time, repeat)
 
+    def remove_animation(self, animation):
+        return self.ticker.remove_animation(animation)
+
 class JSONLoadSave:
 
     def __init__(self, controller: Controller):
