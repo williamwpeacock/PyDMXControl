@@ -329,3 +329,25 @@ def set_bpm(bpm_0: int, bpm_1: int):
         "message": "Set BPM to {}.".format(new_bpm)
     }
     return jsonify(data), 200
+
+@routes.route('sync/<int:val>', methods=['GET'])
+def sync(val: int):
+    current_app.parent.controller.ticker.sync(val)
+
+    data = {
+        "message": "Synced to {} ms.".format(val)
+    }
+    return jsonify(data), 200
+
+@routes.route('nudge/<string:val>', methods=['GET'])
+def nudge(val: str):
+    current_app.parent.controller.ticker.nudge(int(val))
+
+    data = {
+        "message": "Nudged animations by {} ms.".format(val)
+    }
+    return jsonify(data), 200
+
+@routes.route('animations', methods=['GET'])
+def animations():
+    return render_template("animations.jinja2")

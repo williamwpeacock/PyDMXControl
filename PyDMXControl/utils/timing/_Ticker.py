@@ -252,8 +252,9 @@ class Ticker:
         for anim in self.__animations:
             anim.nudge(self.millis_to_bars(ms))
 
-    def sync(self):
-        self.__start_millis = self.millis_now()
+    def sync(self, to = None):
+        self.__start_millis = to if to else self.millis_now()
+
         for anim in self.__animations:
             # Still doesn't always work
             anim.restart(self, 0, True)
