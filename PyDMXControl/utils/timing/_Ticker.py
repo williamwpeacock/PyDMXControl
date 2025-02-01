@@ -249,8 +249,9 @@ class Ticker:
 
     def nudge(self, ms):
         self.__start_millis += ms
-        for anim in self.__animations:
-            anim.nudge(self.millis_to_bars(ms))
+
+    def skip(self, bars):
+        self.nudge(-self.bars_to_millis(bars))
 
     def sync(self, to = None):
         self.__start_millis = to if to else self.millis_now()

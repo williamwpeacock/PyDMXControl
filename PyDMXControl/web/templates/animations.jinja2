@@ -13,12 +13,6 @@
         <article>
             <h2>Sync utilities</h2>
             <table>
-                <thead>
-                <tr>
-                    <th>Callback Name</th>
-                    <th>Run</th>
-                </tr>
-                </thead>
                 <tbody>
                     <tr>
                         <td data-th="Callback Name">
@@ -29,7 +23,7 @@
                                 <input type="submit" value="Update" id="submit" name="submit"/>
                             </form>
                         </td>
-                    <tr>
+                    </tr>
                     <tr>
                         <td data-th="Callback Name">
                             Sync</td>
@@ -38,7 +32,7 @@
                                 <input type="submit" value="Update" id="submit" name="submit"/>
                             </form>
                         </td>
-                    <tr>
+                    </tr>
                     <tr>
                         <td data-th="Callback Name">
                             Nudge (ms)</td>
@@ -48,35 +42,79 @@
                                 <input type="submit" value="Update" id="submit" name="submit"/>
                             </form>
                         </td>
+                    </tr>
                     <tr>
+                        <td data-th="Callback Name">
+                            Skip (bars)</td>
+                        <td data-th="Run">
+                            <form id="skip">
+                                <input id="skip_value" name="skip_value" type="number" min="-64" max="64" step="1" value="0" required/>
+                                <input type="submit" value="Update" id="submit" name="submit"/>
+                            </form>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </article>
 
         <article>
-            <h2>Animations</h2>
-            <table>
-                <thead>
-                <tr>
-                    <th>Callback Name</th>
-                    <th>Run</th>
-                </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th>Callback Name</th>
-                        <th>Run</th>
-                    </tr>
-                    {% for name in animations.keys() %}
+            <h2>Section Select</h2>
+            <form id="section_select">
+                <table>
+                    <tbody>
                         <tr>
-                            <td data-th="Animation Name">
-                                {{ name }}</td>
-                            <td data-th="Run">
-                                <a href="{{ url_for('.callback', cb=name) }}" data-no-reload class="button">Run</a></td>
+                            <td>
+                                <input type="radio" id="chill" name="section_type" value="chill">
+                                <label for="chill"> Chill</label>
+                            </td>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            <table>
+                        <tr>
+                            <td>
+                                <input type="radio" id="buildup" name="section_type" value="buildup">
+                                <label for="buildup"> Build up</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="radio" id="drop" name="section_type" value="drop">
+                                <label for="drop"> Drop</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Apply to:
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="radio" id="current" name="apply_to" value="current">
+                                <label for="current"> Current</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="radio" id="next" name="apply_to" value="next">
+                                <label for="next"> Next</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Section length:
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input id="section_length" name="section_length" type="number" min="1" max="64" step="1" value="16" required/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="submit" value="Submit">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </form>
         </article>
     </section>
 {% endblock body %}
@@ -93,6 +131,16 @@
             if (update) get("{{ url_for('.global_intensity', val=0) }}" + encodeURIComponent(document.getElementById("intensity_value").value));
         }
 
+        function get_radio_selection(name) {
+            var ele = document.getElementsByName(name);
+
+            for (i = 0; i < ele.length; i++) {
+                if (ele[i].checked) {
+                    return ele[i].value
+                }
+            }
+        }
+
         document.getElementById("bpm").addEventListener("submit", function (e) {
             e.preventDefault();
             get("http://localhost:8080/set_bpm/" + encodeURIComponent(Math.floor(document.getElementById("bpm_value").value)) + "/0");
@@ -106,6 +154,16 @@
         document.getElementById("nudge").addEventListener("submit", function (e) {
             e.preventDefault();
             get("http://localhost:8080/nudge/" + encodeURIComponent(document.getElementById("nudge_value").value));
+        });
+
+        document.getElementById("skip").addEventListener("submit", function (e) {
+            e.preventDefault();
+            get("http://localhost:8080/skip/" + encodeURIComponent(document.getElementById("skip_value").value));
+        });
+
+        document.getElementById("section_select").addEventListener("submit", function (e) {
+            e.preventDefault();
+            get("http://localhost:8080/section_select/" + encodeURIComponent(get_radio_selection("section_type")) + "/" + encodeURIComponent(get_radio_selection("apply_to")) + "/" + encodeURIComponent(document.getElementById("section_length").value));
         });
     </script>
 {% endblock script %}

@@ -348,6 +348,22 @@ def nudge(val: str):
     }
     return jsonify(data), 200
 
+@routes.route('skip/<string:val>', methods=['GET'])
+def skip(val: str):
+    current_app.parent.controller.ticker.skip(int(val))
+
+    data = {
+        "message": "Skipped animations by {} bars.".format(val)
+    }
+    return jsonify(data), 200
+
+@routes.route('section_select/<string:section_type>/<string:apply_to>/<string:section_length>', methods=['GET'])
+def section_select(section_type, apply_to, section_length):
+    data = {
+        "message": "Set {} section to {} with length {}.".format(apply_to, section_type, section_length)
+    }
+    return jsonify(data), 200
+
 @routes.route('animations', methods=['GET'])
 def animations():
     return render_template("animations.jinja2")
