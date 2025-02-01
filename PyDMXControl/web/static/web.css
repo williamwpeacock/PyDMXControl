@@ -26,7 +26,6 @@ html, body, section, article, table, form, div {
 /* Table */
 
 table, form, .section {
-    margin: 1em 0;
     background: #34495E;
     border-radius: .4em;
     overflow: auto;
