@@ -13,9 +13,12 @@ from typing import Dict, Callable  # Typing
 from flask import Flask  # Flask
 from werkzeug.serving import make_server  # Flask server
 
+import socket
+
 from ._routes import routes  # Web Routes
 from ..utils import ExceptionThread  # Threading
 from ..utils.timing import TimedEvents  # Timed Events
+from ..animations import Animation  # Timed Events
 
 # Set error only logging
 log = logging.getLogger('werkzeug')
@@ -32,7 +35,12 @@ class ServerThread(ExceptionThread):
         self.ctx.push()
 
     def run(self):
-        print("Started web controller: http://{}:{}".format(self.srv.host, self.srv.port))
+        local_hostname = socket.gethostname()
+        ip_addresses = socket.gethostbyname_ex(local_hostname)[2]
+        filtered_ips = [ip for ip in ip_addresses if ip.startswith("192.")]
+
+        other_ip_msg  =  " or http://{}:{}".format(filtered_ips[0], self.srv.port) if len(filtered_ips) > 0 else ""
+        print("Started web controller: http://{}:{}{}".format(self.srv.host, self.srv.port, other_ip_msg))
         self.srv.serve_forever()
 
     def shutdown(self):
@@ -45,6 +53,7 @@ class WebController:
     def __init__(self, controller: 'Controller', *,
                  callbacks: Dict[str, Callable] = None,
                  timed_events: Dict[str, TimedEvents] = None,
+                 animations: Dict[str, Animation] = None,
                  host: str = "0.0.0.0", port: int = 8080):
 
         # Setup flask
@@ -68,6 +77,9 @@ class WebController:
 
         # Setup timed events
         self.timed_events = {} if timed_events is None else timed_events
+
+        # Setup animations
+        self.animations = {} if animations is None else animations
 
         # Setup template context
         @self.__app.context_processor
