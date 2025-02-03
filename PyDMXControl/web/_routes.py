@@ -357,10 +357,13 @@ def skip(val: str):
     }
     return jsonify(data), 200
 
-@routes.route('section_select/<string:section_type>/<string:apply_to>/<string:section_length>', methods=['GET'])
-def section_select(section_type, apply_to, section_length):
+@routes.route('section_select/<string:section_type>/<string:section_length>/<string:apply_to>/<string:sync_to>', methods=['GET'])
+def section_select(section_type, section_length, apply_to, sync_to):
+    now = current_app.parent.controller.ticker.relative_bars_now() % int(sync_to)
+    start_offset = - now if apply_to == "current" else int(sync_to) - now
+    current_app.parent.animations[f"{section_type}_{section_length}"].start(current_app.parent.controller, None, start_offset, True, 1)
     data = {
-        "message": "Set {} section to {} with length {}.".format(apply_to, section_type, section_length)
+        "message": "Set {} section to {} with length {} with start offset {} bars.".format(apply_to, section_type, section_length, start_offset)
     }
     return jsonify(data), 200
 
