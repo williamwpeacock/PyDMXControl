@@ -2,7 +2,7 @@ from PyDMXControl.controllers import OpenDMXController as Controller
 
 from PyDMXControl import Colors
 from PyDMXControl.animations import Pulse
-from PyDMXControl.animations import Animation, GenericAnimation, CompoundAnimation
+from PyDMXControl.animations import Animation, GenericAnimation, CompoundAnimation, RandomAnimation
 
 dmx = Controller()
 dmx.json.load_config('dj_lights.json')
@@ -75,20 +75,19 @@ def buildup():
     flash = GenericAnimation([(0, Colors.Black), (0.05, Colors.White), (0.1, Colors.Black)], [Animation.linear_color_mix, Animation.linear_color_mix])
 
     anim_len = 16
-    num_flashes = 8
-    num_speed_ups = 4
+    flashes_per_section = 8
+    num_sections = 4
     light_anims = []
     for light in lights:
-        light_anims.append((CompoundAnimation([(CompoundAnimation([ (flash, light.color, 0, 1) ], length = (anim_len/(2**(i+1)))/num_flashes), None, anim_len-(anim_len/(2**i)), num_flashes) for i in range(num_speed_ups)], length = anim_len), None, 0, 1))
+        light_anim_parts = []
+        for i in range(num_sections):
+            light_anim_parts.append((CompoundAnimation([ (flash, light.color, 0, 1) ], length = (anim_len/(2**(i+1)))/flashes_per_section), None, anim_len-(anim_len/(2**i)), flashes_per_section))
+
+        light_anims.append((CompoundAnimation(light_anim_parts, length = anim_len), None, 0, 1))
 
     light_anims
 
-    CompoundAnimation(light_anims, length = anim_len).start(dmx, None, 0, False, -1)
-    # CompoundAnimation([(CompoundAnimation([ (flash, lights[0].color, False, 1) ], length = (anim_len/2)/num_flashes), None, 0, False, num_flashes),
-    #                    (CompoundAnimation([ (flash, lights[0].color, False, 1) ], length = (anim_len/4)/num_flashes), None, anim_len-(anim_len/2), False, num_flashes),
-    #                    (CompoundAnimation([ (flash, lights[0].color, False, 1) ], length = (anim_len/8)/num_flashes), None, anim_len-(anim_len/4), False, num_flashes),
-    #                    (CompoundAnimation([ (flash, lights[0].color, False, 1) ], length = (anim_len/16)/num_flashes), None, anim_len-(anim_len/8), False, num_flashes)
-    #                    ], length = anim_len).start(dmx, None, 0, False, 1)
+    return CompoundAnimation(light_anims, length = anim_len)
 
 def stop_animations():
     dmx.ticker.stop_animations()
@@ -102,7 +101,7 @@ def nudge_forward():
 def sync():
     dmx.ticker.sync()
 
-anims = {
+cbs = {
     "generic_anim": generic_anim,
     "syncopated": syncopated,
     "normal": normal,
@@ -114,9 +113,19 @@ anims = {
     "buildup": buildup
 }
 
+chill_1 = CompoundAnimation([(GenericAnimation([(0, Colors.Red), (2, Colors.Blue), (4, Colors.Red)]), lights[0].color, 0, False, 4)], length = 16)
+chill_2 = CompoundAnimation([(GenericAnimation([(0, Colors.Red), (2, Colors.Green), (4, Colors.Red)]), lights[0].color, 0, False, 4)], length = 16)
+
+chill_bank = RandomAnimation([chill_1, chill_2], length = 16)
+
+anim_banks = {
+    "chill_16": chill_bank,
+    "buildup_16": buildup()
+}
+
 dmx.ticker.set_bpm(176)
 
-dmx.web_control(port=8080, callbacks=anims)
+dmx.web_control(port=8080, callbacks=cbs, animations=anim_banks)
 dmx.sleep_till_enter()
 dmx.close()
 
