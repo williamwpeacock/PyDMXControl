@@ -64,7 +64,29 @@
                     <tbody>
                         <tr>
                             <td>
-                                <input type="radio" id="chill" name="section_type" value="chill">
+                                Section length:
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="radio" id="8" name="section_length" value="8">
+                                <label for="8"> 8</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="radio" id="16" name="section_length" value="16" checked="checked">
+                                <label for="16"> 16</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Section type:
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="radio" id="chill" name="section_type" value="chill" checked="checked">
                                 <label for="chill"> Chill</label>
                             </td>
                         </tr>
@@ -87,7 +109,7 @@
                         </tr>
                         <tr>
                             <td>
-                                <input type="radio" id="current" name="apply_to" value="current">
+                                <input type="radio" id="current" name="apply_to" value="current" checked="checked">
                                 <label for="current"> Current</label>
                             </td>
                         </tr>
@@ -99,12 +121,12 @@
                         </tr>
                         <tr>
                             <td>
-                                Section length:
+                                Sync to nearest (bars):
                             </td>
                         </tr>
                         <tr>
                             <td>
-                                <input id="section_length" name="section_length" type="number" min="1" max="64" step="1" value="16" required/>
+                                <input id="sync_to" name="sync_to" type="number" min="1" max="64" step="1" value="16" required/>
                             </td>
                         </tr>
                         <tr>
@@ -121,16 +143,6 @@
 
 {% block script %}
     <script>
-        function change_input(value, update) {
-            document.getElementById("intensity_value").value = value;
-            input_change(update);
-        }
-
-        function input_change(update) {
-            document.querySelector("label[for='intensity_value']").innerText = "Last Value: " + String(document.getElementById("intensity_value").value);
-            if (update) get("{{ url_for('.global_intensity', val=0) }}" + encodeURIComponent(document.getElementById("intensity_value").value));
-        }
-
         function get_radio_selection(name) {
             var ele = document.getElementsByName(name);
 
@@ -163,7 +175,7 @@
 
         document.getElementById("section_select").addEventListener("submit", function (e) {
             e.preventDefault();
-            get("http://localhost:8080/section_select/" + encodeURIComponent(get_radio_selection("section_type")) + "/" + encodeURIComponent(get_radio_selection("apply_to")) + "/" + encodeURIComponent(document.getElementById("section_length").value));
+            get("http://localhost:8080/section_select/" + encodeURIComponent(get_radio_selection("section_type")) + "/" + encodeURIComponent(get_radio_selection("section_length")) + "/" + encodeURIComponent(get_radio_selection("apply_to")) + "/" + encodeURIComponent(document.getElementById("sync_to").value));
         });
     </script>
 {% endblock script %}
