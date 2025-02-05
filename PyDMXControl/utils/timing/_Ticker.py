@@ -264,3 +264,7 @@ class Ticker:
     def stop_animations(self):
         for anim in self.__animations:
             anim.stop(self)
+
+    def stop_animation_repeats(self):
+        for anim in self.__animations:
+            anim.repeat = 1
