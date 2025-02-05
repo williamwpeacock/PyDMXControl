@@ -205,8 +205,9 @@ class Ticker:
             del self.__callbacks[idx[0]]
 
     def add_animation(self, animation: Animation, setting_func, start_offset: float = 0, snap: bool = True, repeat: int = 1):
-        now = round(self.relative_bars_now()) if snap else self.relative_bars_now()
-        return self.add_animation_at(animation, setting_func, now + start_offset, repeat)
+        start_time = self.relative_bars_now() + start_offset
+        actual_start_time = round(start_time) if snap else start_time
+        return self.add_animation_at(animation, setting_func, actual_start_time, repeat)
 
     def add_animation_at(self, animation, setting_func, start, repeat):
         end = start + animation.length
