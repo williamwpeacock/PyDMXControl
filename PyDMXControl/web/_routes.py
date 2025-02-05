@@ -361,7 +361,14 @@ def skip(val: str):
 def section_select(section_type, section_length, apply_to, sync_to):
     now = current_app.parent.controller.ticker.relative_bars_now() % int(sync_to)
     start_offset = - now if apply_to == "current" else int(sync_to) - now
-    current_app.parent.animations[f"{section_type}_{section_length}"].start(current_app.parent.controller, None, start_offset, True, 1)
+
+    repeat = 1
+    if section_type != "buildup":
+        repeat = -1
+        current_app.parent.controller.ticker.stop_animation_repeats()
+
+    current_app.parent.animations[f"{section_type}_{section_length}"].start(current_app.parent.controller, None, start_offset, True, repeat)
+
     data = {
         "message": "Set {} section to {} with length {} with start offset {} bars.".format(apply_to, section_type, section_length, start_offset)
     }
