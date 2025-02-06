@@ -16,6 +16,14 @@ class Pulse(GenericAnimation):
 
 white_flash = Pulse(Colors.White, 0.05, 0.1)
 
+def strobe_all(val):
+    for light in lights:
+        light.dim(val, 0, "strobe")
+
+make_strobe = CompoundAnimation([
+    (GenericAnimation([(0, 255), (1, 255), (1, 0)]), strobe_all, 0, False, 1)
+], length = 1)
+
 ##### SETUP #####
 
 dmx = Controller()
@@ -96,14 +104,14 @@ chill_16_0 = CompoundAnimation([
     (GenericAnimation([(0, Colors.Magenta), (8, Colors.Red), (16, Colors.Magenta)]), lights[0].color, 0, False, 1),
     (GenericAnimation([(0, Colors.Magenta), (8, Colors.Blue), (16, Colors.Magenta)]), lights[1].color, 0, False, 1),
     (GenericAnimation([(0, Colors.Red), (8, Colors.Magenta), (16, Colors.Red)]), lights[2].color, 0, False, 1),
-    (GenericAnimation([(0, Colors.Blue), (8, Colors.Magenta), (16, Colors.Blue)]), lights[3].color, 0, False, 1),
+    (GenericAnimation([(0, Colors.Blue), (8, Colors.Magenta), (16, Colors.Blue)]), lights[3].color, 0, False, 1)
 ], length = 16)
 
 chill_16_1 = CompoundAnimation([
     (GenericAnimation([(0, Colors.Magenta), (4, Colors.Blue), (12, Colors.Red), (16, Colors.Magenta)]), lights[0].color, 0, False, 1),
     (GenericAnimation([(0, Colors.Magenta), (4, Colors.Red), (16, Colors.Magenta)]), lights[1].color, 0, False, 1),
     (GenericAnimation([(0, Colors.Red), (8, Colors.Magenta), (16, Colors.Red)]), lights[2].color, 0, False, 1),
-    (GenericAnimation([(0, Colors.Blue), (6, Colors.Magenta), (10, Colors.Magenta), (16, Colors.Blue)]), lights[3].color, 0, False, 1),
+    (GenericAnimation([(0, Colors.Blue), (6, Colors.Magenta), (10, Colors.Magenta), (16, Colors.Blue)]), lights[3].color, 0, False, 1)
 ], length = 16)
 
 chill_16_bank = RandomAnimation([
@@ -203,11 +211,11 @@ get_blue = CompoundAnimation([
     (GenericAnimation([(0, Colors.Black), (4, Colors.Blue)]), lights[3].color, 0, False, 1),
 ])
 
-
 drop_16_0 = CompoundAnimation([
     (drums, None, 0, False, 1),
     (red_pulsing, None, 0, False, 16),
-    (get_blue, None, 12, False, 1)
+    (get_blue, None, 12, False, 1),
+    (make_strobe, None, 15, False, 1)
 ], length = 16)
 # drop_16_1 = CompoundAnimation([
 #     (kick_snare, None, 0, False, 16)
