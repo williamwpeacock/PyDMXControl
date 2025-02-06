@@ -6,7 +6,10 @@ class GenericAnimation(Animation):
 
     def __init__(self, points, funcs = None, *args, **kwargs):
         if funcs == None:
-            funcs = [Animation.linear_color_mix for _ in range(len(points)-1)]
+            func = Animation.linear_color_mix
+            if isinstance(points[0][1], int):
+                func = Animation.linear_mix
+            funcs = [func for _ in range(len(points)-1)]
 
         assert len(points) == len(funcs) + 1
         assert points[0][0] == 0

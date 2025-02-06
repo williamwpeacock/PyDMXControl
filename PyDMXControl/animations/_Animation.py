@@ -36,3 +36,7 @@ class Animation:
     @staticmethod
     def linear_color_mix(xy0, xy1, x_):
         return Colors.mix(xy1[1], xy0[1], (x_ - xy0[0]) / (xy1[0] - xy0[0]))
+
+    @staticmethod
+    def linear_mix(xy0, xy1, x_):
+        return xy0[1] + (((x_ - xy0[0]) * (xy1[1] - xy0[1])) / (xy1[0] - xy0[0]))
