@@ -101,6 +101,9 @@ class FixtureHelpers:
         for channel_value in channels_values:
             self.dim(channel_value[1], milliseconds, channel_value[0])
 
+    def strobe(self, value):
+        self.dim(value, 0, "strobe")
+
     def color(self, color: Union[Colors, List[int], Tuple[int], str], milliseconds: int = 0):
         # Handle string color names
         if isinstance(color, str):
