@@ -12,17 +12,17 @@ class Pulse(GenericAnimation):
 
         super().__init__([(0, min_value), (attack, max_value), (delay, min_value)])
 
+class Set(GenericAnimation):
+
+    def __init__(self, value, length):
+        min_value = 0
+        if isinstance(value, list):
+            min_value = [0] * len(value)
+        super().__init__([(0, value), (length, value), (length, min_value)])
+
 #### UTILS #####
 
 white_flash = Pulse(Colors.White, 0.05, 0.1)
-
-def strobe_all(val):
-    for light in lights:
-        light.dim(val, 0, "strobe")
-
-make_strobe = CompoundAnimation([
-    (GenericAnimation([(0, 255), (1, 255), (1, 0)]), strobe_all, 0, False, 1)
-], length = 1)
 
 ##### SETUP #####
 
@@ -211,21 +211,30 @@ get_blue = CompoundAnimation([
     (GenericAnimation([(0, Colors.Black), (4, Colors.Blue)]), lights[3].color, 0, False, 1),
 ])
 
+def make_strobe(light, speed = 255, length = 0.5, color = Colors.Black):
+    return CompoundAnimation([
+        (Set(speed, length), light.strobe, 0, False, 1),
+        (Set(color, length), light.color, 0, False, 1),
+    ], length = length)
+
+strobe_spin = CompoundAnimation([
+    (make_strobe(lights[0], color = Colors.White), None, 0, False, 1),
+    (make_strobe(lights[1], color = Colors.White), None, 0, False, 1)
+], length = 4)
+
 drop_16_0 = CompoundAnimation([
     (drums, None, 0, False, 1),
     (red_pulsing, None, 0, False, 16),
     (get_blue, None, 12, False, 1),
-    (make_strobe, None, 15, False, 1)
+    (strobe_spin, None, 0, False, 4)
 ], length = 16)
-# drop_16_1 = CompoundAnimation([
-#     (kick_snare, None, 0, False, 16)
-# ], length = 16)
 
 drop_16_bank = RandomAnimation([
     drop_16_0
 ], length = 16)
 
 ##### START WEB CONTROLLER #####
+
 
 anim_banks = {
     "chill_8": chill_8_bank,
@@ -236,8 +245,12 @@ anim_banks = {
     "drop_16": drop_16_bank
 }
 
+cbs = {
+    "stop_animations", dmx.ticker.stop_animations
+}
+
 dmx.ticker.set_bpm(174)
 
-dmx.web_control(port=8080, animations=anim_banks)
+dmx.web_control(port=8080, callbacks=cbs, animations=anim_banks)
 dmx.sleep_till_enter()
 dmx.close()
