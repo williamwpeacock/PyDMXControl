@@ -1,4 +1,4 @@
-from PyDMXControl.controllers import OpenDMXController as Controller
+from PyDMXControl.controllers import GUIController as Controller
 
 from PyDMXControl import Colors
 from PyDMXControl.animations import Animation, GenericAnimation, CompoundAnimation, RandomAnimation
@@ -23,6 +23,12 @@ class Set(GenericAnimation):
 #### UTILS #####
 
 white_flash = Pulse(Colors.White, 0.05, 0.1)
+
+def make_strobe(light, speed = 255, length = 0.5, color = Colors.Black):
+    return CompoundAnimation([
+        (Set(speed, length), light.strobe, 0, False, 1),
+        (Set(color, length), light.color, 0, False, 1),
+    ], length = length)
 
 ##### SETUP #####
 
@@ -211,12 +217,6 @@ get_blue = CompoundAnimation([
     (GenericAnimation([(0, Colors.Black), (4, Colors.Blue)]), lights[3].color, 0, False, 1),
 ])
 
-def make_strobe(light, speed = 255, length = 0.5, color = Colors.Black):
-    return CompoundAnimation([
-        (Set(speed, length), light.strobe, 0, False, 1),
-        (Set(color, length), light.color, 0, False, 1),
-    ], length = length)
-
 strobe_spin = CompoundAnimation([
     (make_strobe(lights[0], color = Colors.White), None, 0, False, 1),
     (make_strobe(lights[1], color = Colors.White), None, 0, False, 1)
@@ -246,7 +246,7 @@ anim_banks = {
 }
 
 cbs = {
-    "stop_animations", dmx.ticker.stop_animations
+    "stop_animations": dmx.ticker.stop_animations
 }
 
 dmx.ticker.set_bpm(174)
