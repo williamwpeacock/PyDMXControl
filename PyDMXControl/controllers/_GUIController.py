@@ -25,7 +25,11 @@ class GUIFixture(tk.Label):
 
         rgb = [int(v * brightness) for v in self.fixture.get_color()]
 
-        self.configure(bg=Colors.to_hex(rgb))
+        fg = Colors.Black
+        if self.fixture.has_channel('strobe'):
+            fg = Colors.mix(Colors.Yellow, Colors.Black, self.fixture.get_channel_value('strobe')[0]/255)[:-1]
+
+        self.configure(bg=Colors.to_hex(rgb), fg=Colors.to_hex(fg))
 
 class GUIController(TransmittingController):
 
