@@ -85,7 +85,7 @@ class WebController:
         @self.__app.context_processor
         def variables() -> dict:  # pylint: disable=unused-variable
             return dict({"controller": self.controller, "callbacks": self.callbacks, "timed_events": self.timed_events,
-                         "web_resource": WebController.web_resource},
+                         "web_resource": WebController.web_resource, "animations": self.animations},
                         **dict(globals(), **builtins.__dict__))  # Dictionary stacking to concat
 
         # Setup thread
