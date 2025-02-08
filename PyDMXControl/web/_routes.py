@@ -374,6 +374,27 @@ def section_select(section_type, section_length, apply_to, sync_to):
     }
     return jsonify(data), 200
 
+@routes.route('animation_select/<string:animation_name>/<string:apply_to>/<string:sync_to>', methods=['GET'])
+def animation_select(animation_name, apply_to, sync_to):
+    if apply_to == "one_off":
+        current_app.parent.animations[animation_name].start(current_app.parent.controller, None, 0, False, 1)
+        data = {
+            "message": "Played {}.".format(animation_name)
+        }
+        return jsonify(data), 200
+    else:
+        now = current_app.parent.controller.ticker.relative_bars_now() % int(sync_to)
+        start_offset = - now if apply_to == "current" else int(sync_to) - now
+
+        current_app.parent.controller.ticker.stop_animation_repeats()
+
+        current_app.parent.animations[animation_name].start(current_app.parent.controller, None, start_offset, True, -1)
+
+        data = {
+            "message": "Set {} section to {} with start offset {} bars.".format(apply_to, animation_name, start_offset)
+        }
+        return jsonify(data), 200
+
 @routes.route('animations', methods=['GET'])
 def animations():
     return render_template("animations.jinja2")
