@@ -75,13 +75,13 @@
                         </tr>
                         <tr>
                             <td>
-                                <input type="radio" id="8" name="section_length" value="8">
+                                <input type="radio" id="8" name="section_length" value="8" checked="checked">
                                 <label for="8"> 8</label>
                             </td>
                         </tr>
                         <tr>
                             <td>
-                                <input type="radio" id="16" name="section_length" value="16" checked="checked">
+                                <input type="radio" id="16" name="section_length" value="16">
                                 <label for="16"> 16</label>
                             </td>
                         </tr>
@@ -115,14 +115,14 @@
                         </tr>
                         <tr>
                             <td>
-                                <input type="radio" id="current" name="apply_to" value="current" checked="checked">
-                                <label for="current"> Current</label>
+                                <input type="radio" id="section_current" name="apply_section_to" value="current" checked="checked">
+                                <label for="section_current"> Current</label>
                             </td>
                         </tr>
                         <tr>
                             <td>
-                                <input type="radio" id="next" name="apply_to" value="next">
-                                <label for="next"> Next</label>
+                                <input type="radio" id="section_next" name="apply_section_to" value="next">
+                                <label for="section_next"> Next</label>
                             </td>
                         </tr>
                         <tr>
@@ -132,7 +132,63 @@
                         </tr>
                         <tr>
                             <td>
-                                <input id="sync_to" name="sync_to" type="number" min="1" max="64" step="1" value="16" required/>
+                                <input id="sync_to" name="sync_to" type="number" min="1" max="64" step="1" value="8" required/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="submit" value="Submit">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </form>
+        </article>
+
+        <article>
+            <h2>Animation Queueing</h2>
+            <form id="animation_select">
+                <table>
+                    <tbody>
+                        {% for name in animations.keys() %}
+                            <tr>
+                                <td>
+                                    <input type="radio" id="{{ name }}" name="animation_name" value="{{ name }}">
+                                    <label for="{{ name }}"> {{ name }}</label>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        <tr>
+                            <td>
+                                Apply to:
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="radio" id="anim_current" name="apply_animation_to" value="current" checked="checked">
+                                <label for="anim_current"> Current</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="radio" id="anim_next" name="apply_animation_to" value="next">
+                                <label for="anim_next"> Next</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="radio" id="one_off" name="apply_animation_to" value="one_off">
+                                <label for="one_off"> One off</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Sync to nearest (bars):
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input id="sync_to" name="sync_to" type="number" min="1" max="64" step="1" value="8" required/>
                             </td>
                         </tr>
                         <tr>
@@ -181,7 +237,12 @@
 
         document.getElementById("section_select").addEventListener("submit", function (e) {
             e.preventDefault();
-            get("http://localhost:8080/section_select/" + encodeURIComponent(get_radio_selection("section_type")) + "/" + encodeURIComponent(get_radio_selection("section_length")) + "/" + encodeURIComponent(get_radio_selection("apply_to")) + "/" + encodeURIComponent(document.getElementById("sync_to").value));
+            get("http://localhost:8080/section_select/" + encodeURIComponent(get_radio_selection("section_type")) + "/" + encodeURIComponent(get_radio_selection("section_length")) + "/" + encodeURIComponent(get_radio_selection("apply_section_to")) + "/" + encodeURIComponent(document.getElementById("sync_to").value));
+        });
+
+        document.getElementById("animation_select").addEventListener("submit", function (e) {
+            e.preventDefault();
+            get("http://localhost:8080/animation_select/" + encodeURIComponent(get_radio_selection("animation_name")) + "/" + encodeURIComponent(get_radio_selection("apply_animation_to")) + "/" + encodeURIComponent(document.getElementById("sync_to").value));
         });
     </script>
 {% endblock script %}
